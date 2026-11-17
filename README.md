@@ -126,5 +126,7 @@ minikube service app-service --url    # URL da aplicação
 ![traces](docs/evidencias/06-grafana-traces.png)
 
 ## 6. Integrantes
-- Nome 1
-- Nome 2
+- Lúcio Aguiar de Souza
+- Guilherme Silva Costa
+- Nome 3
+- Nome 4
