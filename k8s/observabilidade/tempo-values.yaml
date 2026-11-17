@@ -1,0 +1,19 @@
+# Helm chart: grafana-community/tempo  (modo single binary)
+# Recebe os traces do OTel Collector via OTLP (porta 4317) e responde consultas na porta 3200.
+
+tempo:
+  retention: 24h
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+persistence:
+  enabled: false

@@ -1,0 +1,7 @@
+# Prints de erro colocados na raiz durante o desenvolvimento (as evidências oficiais ficam em docs/evidencias/)
+/*.png
+/*.jpg
+/*.jpeg
+__pycache__/
+*.pyc
+.venv/

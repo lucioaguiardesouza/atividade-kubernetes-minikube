@@ -1,0 +1,12 @@
+# PersistentVolumeClaim: "pede" 1Gi de disco ao cluster para guardar os dados do Postgres.
+# Assim, se o pod do banco reiniciar, as notas não se perdem.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: banco-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

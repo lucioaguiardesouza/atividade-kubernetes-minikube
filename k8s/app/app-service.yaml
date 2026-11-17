@@ -1,0 +1,14 @@
+# Service NodePort: expõe a aplicação fora do cluster (porta 30080 do nó do Minikube)
+# e faz o balanceamento de carga entre as réplicas (pods com label app=app-notas).
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  type: NodePort
+  selector:
+    app: app-notas
+  ports:
+    - port: 80          # porta do Service dentro do cluster
+      targetPort: 8000  # porta do container
+      nodePort: 30080   # porta exposta no nó

@@ -1,0 +1,76 @@
+# Deployment da aplicação com 2 réplicas conectadas ao banco.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-notas
+  labels:
+    app: app-notas
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app-notas
+  template:
+    metadata:
+      labels:
+        app: app-notas
+    spec:
+      containers:
+        - name: app
+          image: app-notas:1.0
+          imagePullPolicy: Never      # imagem construída dentro do Minikube (minikube image build)
+          ports:
+            - containerPort: 8000
+          env:
+            # ---- Conexão com o banco ----
+            - name: DB_HOST
+              value: banco-service
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef: { name: banco-secret, key: POSTGRES_DB }
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef: { name: banco-secret, key: POSTGRES_USER }
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: { name: banco-secret, key: POSTGRES_PASSWORD }
+            # ---- Nome do pod (Downward API) - exibido na tela para provar o balanceamento ----
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            # ---- OpenTelemetry: envia traces para o OTel Collector ----
+            - name: OTEL_SERVICE_NAME
+              value: app-notas
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector.observabilidade.svc.cluster.local:4317
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: grpc
+            - name: OTEL_TRACES_EXPORTER
+              value: otlp
+            - name: OTEL_METRICS_EXPORTER
+              value: none
+            - name: OTEL_LOGS_EXPORTER
+              value: none             # logs vão para o stdout e o Collector lê dos arquivos do nó
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.namespace=atividade-k8s,deployment.environment=minikube
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 256Mi

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>App Notas - Kubernetes</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; background: #f5f7fa; color: #1f2933; }
+    h1 { margin-bottom: .2rem; }
+    .pod { background: #326ce5; color: #fff; padding: .8rem 1rem; border-radius: 8px; margin: 1rem 0; }
+    .pod code { font-size: 1.1rem; font-weight: bold; }
+    form { display: flex; gap: .5rem; margin: 1rem 0; }
+    input[type=text] { flex: 1; padding: .6rem; border: 1px solid #cbd2d9; border-radius: 6px; }
+    button { padding: .6rem 1.2rem; background: #326ce5; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; }
+    th, td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid #e4e7eb; font-size: .92rem; }
+    th { background: #e4e7eb; }
+    small { color: #616e7c; }
+  </style>
+</head>
+<body>
+  <h1>📝 App Notas</h1>
+  <small>FastAPI + PostgreSQL rodando no Kubernetes (Minikube)</small>
+
+  <div class="pod">
+    Esta página foi atendida pelo pod: <code>{{ pod }}</code><br>
+    <small style="color:#dbe4ff">Banco de dados: {{ db_host }} — recarregue (Ctrl+F5) para ver outra réplica responder</small>
+  </div>
+
+  <form method="post" action="/notas">
+    <input type="text" name="texto" placeholder="Escreva uma nota..." required maxlength="500">
+    <button type="submit">Salvar no banco</button>
+  </form>
+
+  <table>
+    <tr><th>#</th><th>Nota</th><th>Gravada pelo pod</th><th>Quando</th></tr>
+    {% for n in notas %}
+    <tr><td>{{ n[0] }}</td><td>{{ n[1] }}</td><td><code>{{ n[2] }}</code></td><td>{{ n[3].strftime('%d/%m %H:%M:%S') }}</td></tr>
+    {% else %}
+    <tr><td colspan="4"><small>Nenhuma nota ainda. Cadastre a primeira!</small></td></tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

@@ -1,0 +1,44 @@
+# Helm chart: open-telemetry/opentelemetry-collector
+# Roda como DaemonSet (1 pod por nó) e faz dois trabalhos:
+#   1) TRACES: recebe via OTLP os traces da aplicação e envia para o Tempo
+#   2) LOGS:   lê os arquivos de log de todos os pods do nó (/var/log/pods) e envia para o Loki
+
+mode: daemonset
+fullnameOverride: otel-collector   # nome do Service = otel-collector
+
+image:
+  repository: otel/opentelemetry-collector-contrib
+command:
+  name: otelcol-contrib
+
+service:
+  enabled: true                    # cria o Service para a app enviar os traces
+
+presets:
+  logsCollection:
+    enabled: true                  # adiciona o receiver "filelog" lendo /var/log/pods
+    includeCollectorLogs: false
+  kubernetesAttributes:
+    enabled: true                  # enriquece com k8s.pod.name, k8s.deployment.name, etc.
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    memory: 512Mi
+
+config:
+  exporters:
+    otlp/tempo:
+      endpoint: tempo.observabilidade.svc.cluster.local:4317
+      tls:
+        insecure: true
+    otlphttp/loki:
+      endpoint: http://loki-gateway.observabilidade.svc.cluster.local/otlp
+  service:
+    pipelines:
+      traces:
+        exporters: [otlp/tempo]
+      logs:
+        exporters: [otlphttp/loki]

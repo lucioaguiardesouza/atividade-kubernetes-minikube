@@ -1,0 +1,48 @@
+# Deployment do PostgreSQL (1 réplica - banco de dados não se replica só aumentando replicas).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate          # evita dois pods do banco usando o mesmo disco ao mesmo tempo
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: banco-secret      # POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: dados
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:               # só recebe tráfego quando aceitar conexões
+            exec:
+              command: ["sh", "-c", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+      volumes:
+        - name: dados
+          persistentVolumeClaim:
+            claimName: banco-pvc

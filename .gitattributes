@@ -1,0 +1,4 @@
+# Garante quebra de linha Linux (LF) - scripts .sh com CRLF do Windows quebram no Codespaces
+* text=auto eol=lf
+*.png binary
+*.jpg binary

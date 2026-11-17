@@ -1,0 +1,56 @@
+# Helm chart: prometheus-community/kube-prometheus-stack
+# Instala Prometheus (métricas), kube-state-metrics, node-exporter e Grafana (dashboards).
+# Aqui também cadastramos o Loki e o Tempo como fontes de dados do Grafana.
+
+alertmanager:
+  enabled: false            # não precisamos de alertas na atividade (economiza memória)
+
+prometheus:
+  prometheusSpec:
+    retention: 1d
+    scrapeInterval: 15s
+    resources:
+      requests:
+        cpu: 100m
+        memory: 400Mi
+
+grafana:
+  adminUser: admin
+  adminPassword: admin123
+  service:
+    type: NodePort
+    nodePort: 30300
+  sidecar:
+    dashboards:
+      enabled: true          # carrega dashboards de ConfigMaps com label grafana_dashboard=1
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      uid: loki
+      access: proxy
+      url: http://loki-gateway.observabilidade.svc.cluster.local
+      jsonData:
+        # Liga Logs -> Traces: transforma o "trace_id=..." do log num link para o Tempo
+        derivedFields:
+          - name: TraceID
+            datasourceUid: tempo
+            matcherRegex: "trace_id=(\\w+)"
+            url: "$${__value.raw}"
+    - name: Tempo
+      type: tempo
+      uid: tempo
+      access: proxy
+      url: http://tempo.observabilidade.svc.cluster.local:3200
+      jsonData:
+        # Liga Traces -> Logs: do trace, abre os logs do mesmo pod no Loki
+        tracesToLogsV2:
+          datasourceUid: loki
+          spanStartTimeShift: "-5m"
+          spanEndTimeShift: "5m"
+          filterByTraceID: true
+          customQuery: true
+          query: '{k8s_namespace_name="default"} |= "$${__span.traceId}"'
+        serviceMap:
+          datasourceUid: prometheus
+        nodeGraph:
+          enabled: true
