@@ -1,6 +1,7 @@
 {
   "name": "Atividade Kubernetes - Minikube",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  // Ubuntu 24.04 fixo (a tag "ubuntu" sem versão muda sozinha e pode quebrar as features)
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
 
   // Pede uma máquina de 4 núcleos / 16 GB (a stack completa não cabe na de 8 GB)
   "hostRequirements": {
@@ -8,16 +9,12 @@
     "memory": "16gb"
   },
 
+  // Só o Docker vem como feature; kubectl, helm e minikube são instalados pelo script abaixo
   "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
-      "version": "latest",
-      "helm": "latest",
-      "minikube": "latest"
-    }
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
 
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y socat && chmod +x scripts/*.sh",
+  "postCreateCommand": "bash .devcontainer/instalar-ferramentas.sh",
 
   "forwardPorts": [8080, 3000],
   "portsAttributes": {
