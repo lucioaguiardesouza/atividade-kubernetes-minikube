@@ -104,6 +104,9 @@ minikube service app-service --url    # URL da aplicação
 
 ## 5. Evidências
 
+### Etapa 1: Minikube iniciado e nó `Ready`
+![minikube get nodes](docs/evidencias/00-minikube-get-nodes.png)
+
 ### `kubectl get pods`: 2 réplicas da app e o banco rodando
 ![kubectl get pods](docs/evidencias/01-kubectl-get-pods.png)
 

@@ -15,6 +15,7 @@ sudo install -m 0755 /tmp/kubectl /usr/local/bin/kubectl
 
 echo ">> Instalando helm..."
 curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+sudo chmod 755 /usr/local/bin/helm   # o instalador pode deixar o binário sem permissão de execução
 
 echo ">> Instalando minikube..."
 curl -fsSLo /tmp/minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
