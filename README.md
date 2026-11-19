@@ -128,5 +128,5 @@ minikube service app-service --url    # URL da aplicação
 ## 6. Integrantes
 - Lúcio Aguiar de Souza
 - Guilherme Silva Costa
-- Nome 3
+- Vinicius Pereira De Lima
 - Nome 4
