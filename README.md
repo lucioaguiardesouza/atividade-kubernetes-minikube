@@ -129,4 +129,4 @@ minikube service app-service --url    # URL da aplicação
 - Lúcio Aguiar de Souza
 - Guilherme Silva Costa
 - Vinicius Pereira De Lima
-- Nome 4
+- Ramon Silva
